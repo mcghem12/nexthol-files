@@ -6,10 +6,6 @@ Files
 
 *The estimated time to complete this lab is 60 minutes.*
 
-.. raw:: html
-
-  <iframe width="640" height="360" src="https://www.youtube.com/embed/0yWcTctwD3Y?rel=0&amp;showinfo=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 Overview
 ++++++++
 
@@ -17,7 +13,6 @@ Traditionally, file storage has been yet another silo within IT, introducing unn
 
 **In this lab you will step through a Files deployment, manage SMB shares and NFS exports, scale out the environment, and explore upcoming Files features. The lab will provide key considerations around deployment, configuration, and use cases.**
 
-.. _deploying_files:
 
 Lab Setup
 +++++++++
@@ -426,11 +421,6 @@ In the upcoming Files 3.5 launch, Files will introduce:
 
 - A new File Analytics dashboard, providing a comprehensive view into Files usage for the purposes of capacity planning, security, and compliance.
 
-**Check out the video below for a look at the upcoming Files enhancements!**
-
-.. raw:: html
-
-  <iframe width="640" height="360" src="https://www.youtube.com/embed/thkOoPHQHNE?rel=0&amp;showinfo=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 Takeaways
 +++++++++
@@ -443,39 +433,5 @@ What are the key things you should know about **Nutanix Files**?
 
 - Files can scale up and scale out with One Click performance optimization.
 
-- Interested in Files backup? Check out the :ref:`hycu` lab!
 
 .. - Interested in Active/Active Files deployments? Check out the :ref:`peer` lab!
-
-Cleanup
-+++++++
-
-.. raw:: html
-
-  <strong><font color="red">Once your lab completion has been validated, PLEASE do your part to remove any unneeded VMs to ensure resources are available for all users on your shared cluster.</font></strong>
-
-If you do **NOT** intend to complete the :ref:`peer` or :ref:`hycu` labs, you can delete your Files deployment. If you **DO** intend to complete the :ref:`peer` or :ref:`hycu` labs, you will use your existing Files deployment.
-
-Getting Connected
-+++++++++++++++++
-
-Have a question about **Nutanix Files**? Please reach out to the resources below:
-
-+---------------------------------------------------------------------------------+
-|  Files Product Contacts                                                         |
-+================================+================================================+
-|  Slack Channels                |  #nutanix-files, #new_files_licensing          |
-+--------------------------------+------------------------------------------------+
-|  Product Manager               |  Vikram Gupta, vikram.gupta@nutanix.com        |
-+--------------------------------+------------------------------------------------+
-|  Product Marketing Manager     |  Devon Helms, devon.helms@nutanix.com          |
-+--------------------------------+------------------------------------------------+
-|  Technical Marketing Engineer  |  Mike McGhee, mike.mcghee@nutanix.com          |
-+--------------------------------+------------------------------------------------+
-
-Additional Resources
-++++++++++++++++++++
-
-- `Nutanix Files Sizing Guide <http://download.nutanix.com/solutionsDocs/TN-2066-Nutanix-Files-Sizing-Guide.pdf>`_
-- `Nutanix Files Sizing Video (Employee Link) <https://mindtickle.app.link/Ooah0gdXTT>`_
-- `Nutanix Files Sizing Video (Partner Link) <https://mindtickle.app.link/7XrD1H6yzU>`_
