@@ -43,7 +43,7 @@ Fill out the following fields:
     - Select **Add**
 
 - Select **Add New NIC**
-    - **VLAN Name** - Secondary
+    - **VLAN Name** - Primary
     - Select **Add**
 
 Click **Save** to create the VM.
