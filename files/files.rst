@@ -19,7 +19,7 @@ Lab Setup
 
 This lab requires applications provisioned as part of the :ref:`windows_tools_vm`.
 
-If you have not yet deployed this VM, see the linked steps before proceeding with the lab.
+If you have not yet deployed this VM, see the linked steps and deploy this VM after starting the installation of files in the next section.
 
 Deploying Files
 +++++++++++++++
@@ -28,7 +28,7 @@ Deploying Files
 
    .. figure:: images/1.png
 
-   For the purpose of saving time, the Files 3.2.0.1 package has already been uploaded to your cluster. Files binaries can be downloaded directly through Prism or uploaded manually.
+   For the purpose of saving time, the Files 3.5 package has already been uploaded to your cluster. Files binaries can be downloaded directly through Prism or uploaded manually.
 
    .. figure:: images/2.png
 
@@ -60,13 +60,11 @@ Deploying Files
 
 #. Click **Next**.
 
-#. Select the **Secondary - Managed** VLAN for the **Client Network**.
+#. Select the **Primary - Managed** VLAN for the **Client Network**.
 
    Each Files VM will consume a single IP on the client network.
 
    .. note::
-
-     In the HPOC environment it is critical to use the secondary VLAN for the client network if using separate client and storage networks.
 
      It is typically desirable in production environments to deploy Files with dedicated virtual networks for client and storage traffic. When using two networks, Files will, by design, disallow client traffic the storage network, meaning VMs assigned to the primary network will be unable to access shares.
 
@@ -105,7 +103,7 @@ Deploying Files
 
    .. figure:: images/9.png
 
-   .. note:: Similar to NFSv3, in Unmanaged mode, users are only identified by UID/GID. In Files 3.2, NFS connections will still require an NFSv4 capable client.
+   .. note:: In unmanaged mode, users are only identified by UID/GID. In Files 3.5, Files supports both NFSv3 and NFSv4
 
 #. Click **Next**.
 
@@ -124,6 +122,19 @@ Deploying Files
    .. note::
 
      If you receive a warning regarding DNS record validation failure, this can be safely ignored. The shared cluster does not use the same DNS servers as your Files cluster, and as a result is unable to resolve the DNS entries created when deploying Files.
+
+#. While waiting for the file server deployment, if you have not already done so deploy the Windows Tools VM.
+
+#. Connect to the Windows Tools VM via RDP or console
+
+#. Download the sample files for File Analytics to the Tools VM:
+
+   - `https://peerresources.blob.core.windows.net/sample-data/SampleData_Small.zip <https://peerresources.blob.core.windows.net/sample-data/SampleData_Small.zip>`_
+
+#. Download the File Analytics json and qcow files to the Tools VM
+
+   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
+   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
 
 #. Upon completion, return to **Prism > File Server** and select the *Initials*\ **-Files** server and click **Protect**.
 
@@ -160,9 +171,9 @@ Creating the Share
 
    .. figure:: images/15.png
 
-   As you are creating a departmental share, it should be created as a **Standard** share. This means that all top level directories and files within the share, as well as connections to the share, are served from a single Files VM.
+   Because this is a single node AOS cluster and therefore a single file server VM, all shares will be **Standard** shares. A Standard share means that all top level directories and files within the share, as well as connections to the share, are served from a single file server VM.
 
-   **Distributed** shares are appropriate for home directories, user profiles, and application folders. This type of share shards top level directories across all Files VMs and load balances connections across all Files VMs within the Files cluster.
+   If this were a three node Files cluster or larger you’d have an option to create a **Distributed** share.  Distributed shares are appropriate for home directories, user profiles, and application folders. This type of share shards top level directories across all Files VMs and load balances connections across all Files VMs within the Files cluster.
 
    **Access Based Enumeration (ABE)** ensures that only files and folders which a given user has read access are visible to that user. This is commonly enabled for Windows file shares.
 
@@ -187,15 +198,18 @@ Testing the Share
 
    .. figure:: images/17.png
 
-#. Test accessing the Marketing share by opening the share and copying or creating files and directories. The **NTNXLAB\\Administrator** user was specified as a Files Administrator during deployment of the Files cluster, giving it read/write access to all shares by default.
+#. Test accessing the Marketing share by extracting the SampleData_Small.zip files downloaded in the previous step into the share.
 
-   Managing access for other users is no different than any other SMB share.
+   .. figure:: images/18.png
+
+   - The **NTNXLAB\\Administrator** user was specified as a Files Administrator during deployment of the Files cluster, giving it read/write access to all shares by default.
+   - Managing access for other users is no different than any other SMB share.
 
 #. Right-click **Marketing > Properties**.
 
 #. Select the **Security** tab and click **Advanced**.
 
-   .. figure:: images/18.png
+   .. figure:: images/19.png
 
 #. Select **Users (**\ *Initials*\ **-Files\\Users)** and click **Remove**.
 
@@ -203,7 +217,7 @@ Testing the Share
 
 #. Click **Select a principal** and specify **Everyone** in the **Object Name** field. Click **OK**.
 
-   .. figure:: images/19.png
+   .. figure:: images/20.png
 
 #. Fill out the following fields and click **OK**:
 
@@ -214,7 +228,7 @@ Testing the Share
    - Select **Read**
    - Select **Write**
 
-   .. figure:: images/20.png
+   .. figure:: images/21.png
 
 #. Click **OK > OK > OK** to save the permission changes.
 
@@ -231,13 +245,13 @@ Testing the Share
    - **Quota** - 10 GiB
    - **Enforcement Type** - Hard Limit
 
-   .. figure:: images/21.png
+   .. figure:: images/22.png
 
 #. Click **Save**.
 
 #. With the Marketing share still selected, review the **Share Details**, **Usage** and **Performance** tabs to understand the available on a per share basis, including the number of files & connections, storage utilization over time, latency, throughput, and IOPS.
 
-   .. figure:: images/22.png
+   .. figure:: images/23.png
 
 Using NFS Exports
 +++++++++++++++++
@@ -258,21 +272,20 @@ Creating the Export
    - **Max Size (Optional)** - Leave blank
    - **Select Protocol** - NFS
 
-   .. figure:: images/23.png
+   .. figure:: images/24.png
 
 #. Click **Next**.
 
 #. Fill out the following fields:
 
-   - Select **Use "Distributed" share/export type instead of "Standard"**
+   - Select **Enable Self Service Restore**
+      - These snapshots appear as a .snapshot directory for NFS clients.
    - **Authentication** - System
    - **Default Access (For All Clients)** - No Access
    - Select **+ Add exceptions**
-   - **Clients with Read-Write Access** - *The first 3 octets of your cluster network*\ .* (e.g. 10.42.78.\*)
+   - **Clients with Read-Write Access** - *The first 3 octets of your cluster network*\ .* (e.g. 10.38.1.\*)
 
-   .. figure:: images/24.png
-
-   A Distributed share type is more appropriate in this scenario if you have a dedicated top level directory for each host saving their logs on this share, allowing for effective load balancing across the Files cluster.
+   .. figure:: images/25.png
 
    By default an NFS export will allow read/write access to any host that mounts the export, but this can be restricted to specific IPs or IP ranges.
 
@@ -283,9 +296,7 @@ Testing the Export
 
 You will first provision a CentOS VM to use as a client for your Files export.
 
-.. note::
-
-  If you have already deployed the :ref:`linux_tools_vm` as part of another lab, you may use this VM as your NFS client instead.
+.. note:: If you have already deployed the :ref:`linux_tools_vm` as part of another lab, you may use this VM as your NFS client instead.
 
 #. In **Prism > VM > Table**, click **+ Create VM**.
 
@@ -297,14 +308,12 @@ You will first provision a CentOS VM to use as a client for your Files export.
    - **Number of Cores per vCPU** - 1
    - **Memory** - 2 GiB
    - Select **+ Add New Disk**
-
-     - **Operation** - Clone from Image Service
-     - **Image** - CentOS
-     - Select **Add**
+      - **Operation** - Clone from Image Service
+      - **Image** - CentOS
+      - Select **Add**
    - Select **Add New NIC**
-
-     - **VLAN Name** - Secondary
-     - Select **Add**
+      - **VLAN Name** - Primary
+      - Select **Add**
 
 #. Click **Save**.
 
@@ -355,71 +364,160 @@ You will first provision a CentOS VM to use as a client for your Files export.
 
    Note that the utilization data is updated every 10 minutes.
 
-(Optional) Expanding a Files Cluster
-++++++++++++++++++++++++++++++++++++
+File Analytics
++++++++++++++++++
+In this exercise you will deploy the File Analytics VM and scan the existing shares to build out the dashboard.  You will also create anomaly alerts and view the audit details for your file server instance.
 
-Files offers the ability to scale up and scale out a deployment. Scaling up the CPU and memory of Files VMs allows an environment to support higher storage throughput and number of concurrent sessions. Currently, Files VMs can be scaled up to a maximum of 12 vCPU and 96GB of RAM each.
+#. In **Prism** > **File Server** > click **Deploy File Analytics**
 
-The true power of Files scalability is the ability to simply add more Files VMs, scaling out much like the underlying Nutanix distributed storage fabric. An individual Files cluster can scale out up to the number of physical nodes in the Nutanix cluster, ensuring that no more than 1 Files VM runs on a single node during normal operation.
+   .. figure:: images/31.png
+#. Select **Deploy**
+#. Choose **Upload the File Analytics binary**
+#. Select **Choose File** and navigate to the .json and .qcow2 downloaded in the earlier steps
 
-#. Return to **Prism > File Server** and select *Initials*\ **-Files**.
+   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
+   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
 
-#. Click **Update > Number of File Server VMs**.
+   .. figure:: images/32.png
 
-   .. figure:: images/25.png
+#. Select **Upload Now**
+#. After the upload completes select **Install**
+#. Fill out the details
 
-#. Increment the number of Files VMs from 3 to 4 and click **Next**.
+   - **Name** - Initials
+   - **Storage Container** – Will automatically select the container used by your file server instance
+   - **Network List** – Primary - Managed
 
-   .. figure:: images/26.png
+#. Select **Show Advanced Settings**
+#. Ensure **DNS Resolver IP** is set to your Active Directory, ntnxlab.local, domain controller/DNS IP address and **ONLY** that address.
+#. Choose **Deploy**
+#. You can monitor the deployment from the **Tasks** page.  The Analytics VM deployment should take ~5 minutes.
+#. In **Prism** > **File Server** > click **File Analytics**
 
-   Note that an additional IP will be consumed for both the client and storage networks to support the added Files VM.
+   .. figure:: images/33.png
 
-#. Click **Next > Save**.
+#. On the Enable File Analytics page enter your domain administrator which is also your file server administrator.
 
-   The cluster will now deploy and power on a 4th Files VM. Status can be monitored in **Prism > Tasks**.
+   - **Username**: administrator
+   - **Password**: nutanix/4u
 
-   .. note::
+   .. figure:: images/34.png
 
-     Files cluster expansion should take approximately 10 minutes to complete.
+#. Select **Enable**
+#. Analytics will perform an initial scan of the existing shares which will take just a couple minutes.  You can see the scan by going to the gear icon within the Analytics UI and selecting **Scan File System**
 
-   Following the expansion, verify client connections can now be load balanced to the new VM.
+   .. figure:: images/35.png
 
-#. Connect to your *Initials*\ **-ToolsVM** via RDP or console.
+#. Choose **Cancel** to exit the scan details window
+#. After viewing the scan details, refresh your browser.  You should see the **Data Age**, **File Distribution by Size** and **File Distribution by Type** dashboard panels update.
 
-#. Open **Control Panel > Administrative Tools > DNS**.
+   .. figure:: images/36.png
 
-#. Fill out the following fields and click **OK**:
+#. Create some audit trail activity by going to the marketing share and opening one of the word files under **Sample Data** > **Documents**
 
-   - Select **The following computer**
-   - Specify **dc.ntnxlab.local**
-   - Select **Connect to the specified computer now**
+   .. note:: You may need to complete a short wizard for OpenOffice if using that application to open a file.
 
-   .. figure:: images/28.png
+#. Refresh the **Dashboard** page in your browser to see the **Top 5 active users**, **Top 5 accessed files** and **File Operations** panels update
 
-#. Open **DC.ntnxlab.local > Forward Lookup Zones > ntnxlab.local** and verify there are now four entries for *Initials*\ -**files**. Files leverages round robin DNS to load balance connections across Files VMs.
+   .. figure:: images/37.png
 
-   .. figure:: images/29.png
+#. Click on your user under **Top 5 active users**.  This will take you to the audit trail of the user.
+#. You can also click on the **Audit Trails** menu and search for either your user or a given file.  You can use wildcards for your search, for example *.doc*
 
-   .. note::
+   .. figure:: images/38.png
 
-     If only three entries are present, you can automatically update DNS entries from **Prism > File Server** by selecting your Files cluster and clicking **DNS**.
+#. Next, create two anomaly rules by going to **Define Anomaly Rules** from under the gear icon
 
-Coming Soon!
+   .. figure:: images/39.png
+
+#. Choose **Define Anomaly Rules** and create a rule with the following settings
+
+   - **Events:** Delete
+   - **Minimum Operation %:** 1
+   - **Minimum Operation Count:** 10
+   - **User:** All Users
+   - **Type:** Hourly
+   - **Interval:** 1
+#. Choose **Save** for that anomaly table entry
+#. Choose **+ Configure new anomaly** and create a second rule with the following settings
+
+   - **Events**: Delete
+   - **Minimum Operation %**: 1
+   - **Minimum Operation Count**: 10
+   - **User**: All Users
+   - **Type**: Hourly
+   - **Interval**: 1
+#. Choose **Save** for that anomaly table entry
+
+   .. figure:: images/40.png
+
+#. Select **Save** to exit the Define Anomaly Rules window
+#. Go to the Sample Data folder in the Marketing share and copy, then paste that folder to the same share.
+
+   .. figure:: images/42.png
+
+#. Now delete the original Sample Data folder.
+#. While waiting for the Anomaly Alerts to populate we’ll create a permission denial.
+
+   .. note:: The Anomaly engine runs every 30 minutes.  While this setting is configurable from the File Analytics VM, modifying this variable is outside the scope of this lab.
+
+#. Create a new directory called **RO** in the Marketing share
+#. Create a text file in the **RO** directory with some text like “hello world” called **myfile.txt**
+#. Go to the **Properties** of the **RO** folder and select the Security tab
+#. Select **Advanced**
+#. Choose **Disable inheritance** and select the **Convert…** option
+#. Then edit the Everyone permissions with the following:
+
+   - Read & Execute
+   - List folder contents
+   - Read
+
+   .. figure:: images/43.png
+
+#. Choose **OK** then **OK** again
+#. Open a PowerShell window as a specific user
+
+   - Hold down **Shift** and **right click** on the **PowerShell icon** on the taskbar
+   - Select **Run as different user**
+
+   .. figure:: images/44.png
+
+#. Enter the following
+
+   - **User name**: Poweruser01
+   - **Password**: nutanix/4u
+
+#. Change Directories into the Marketing share and the **RO** directory
+
+     .. code-block:: bash
+
+        cd \\xyz-files.ntnxlab.local\marketing\RO
+
+#. Execute the following commands, the first should succeed, the second should fail:
+
+     .. code-block:: bash
+
+        more .\myfile.txt
+        rm .\myfile.txt
+
+   .. figure:: images/45.png
+
+#. After a minute or so you should see **Permission Denials** in both the dashboard and the **Audit Trails** view.  You may need to refresh your browser.
+
+   .. figure:: images/46.png
+
+   .. note:: The Capacity Trend dashboard panel updates every 24 hrs.
+
+New with Files 3.5
 ++++++++++++
-
-In the upcoming Files 3.5 launch, Files will introduce:
+With the recent Files 3.5 release we have introduced:
 
 - Support for NFSv3
-
 - Support for Self-Service File Restore for NFS (currently supported for SMB shares)
-
 - Support for Change File Tracking (CFT) Backup for NFS (currently supported for SMB shares)
-
 - Support for Nutanix software-based Data-At-Rest Encryption
-
 - Support for multi-protocol access to shares
-
-- A new File Analytics dashboard, providing a comprehensive view into Files usage for the purposes of capacity planning, security, and compliance.
+- File Analytics, a comprehensive view into Files usage for the purposes of insights into file system data, file and user audit trails and anomaly detection.
 
 
 Takeaways
@@ -428,10 +526,10 @@ Takeaways
 What are the key things you should know about **Nutanix Files**?
 
 - Files can be rapidly deployed on top of existing Nutanix clusters, providing SMB and NFS storage for user shares, home directories, departmental shares, applications, and any other general purpose file storage needs.
-
 - Files is not a point solution. VM, File, Block, and Object storage can all be delivered by the same platform using the same management tools, reducing complexity and management silos.
-
 - Files can scale up and scale out with One Click performance optimization.
+- File Analytics helps you better understand how data is utilized by your organizations to help you meet your data auditing, data access minimization and compliance requirements.
+
 
 
 .. - Interested in Active/Active Files deployments? Check out the :ref:`peer` lab!
