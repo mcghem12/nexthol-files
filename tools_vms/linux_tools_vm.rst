@@ -31,7 +31,7 @@ Fill out the following fields:
 - Select **+ Add New Disk**
     - **Type** - DISK
     - **Operation** - Clone from Image Service
-    - **Image** - CentOS7.qcow2
+    - **Image** -  Linux_ToolsVM.qcow2
     - Select **Add**
 
 - Select **Add New NIC**
@@ -42,57 +42,59 @@ Click **Save** to create the VM.
 
 Power on the VM.
 
-Installing Tools
-++++++++++++++++
+..  +++++++++++++++++++++++++++++++++++++++++++++++
 
-Login to the VM via ssh or Console session, using the following credentials:
+  Installing Tools
+  ++++++++++++++++
 
-- **Username** - root
-- **password** - nutanix/4u
+  Login to the VM via ssh or Console session, using the following credentials:
 
-Install the software needed by running the following commands:
+  - **Username** - root
+  - **password** - nutanix/4u
 
-.. code-block:: bash
+  Install the software needed by running the following commands:
 
-  yum update -y
-  yum install -y ntp ntpdate unzip stress nodejs python-pip s3cmd awscli
-  npm install -g request
-  npm install -g express
+  .. code-block:: bash
+
+    yum update -y
+    yum install -y ntp ntpdate unzip stress nodejs python-pip s3cmd awscli
+    npm install -g request
+    npm install -g express
 
 
-Configuring NTP
-...............
+  Configuring NTP
+  ...............
 
-Enable and configure NTP by running the following commands:
+  Enable and configure NTP by running the following commands:
 
-.. code-block:: bash
+  .. code-block:: bash
 
-  systemctl start ntpd
-  systemctl enable ntpd
-  ntpdate -u -s 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
-  systemctl restart ntpd
+    systemctl start ntpd
+    systemctl enable ntpd
+    ntpdate -u -s 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
+    systemctl restart ntpd
 
-Disabling Firewall and SELinux
-..............................
+  Disabling Firewall and SELinux
+  ..............................
 
-Disable the firewall and SELinux by running the following commands:
+  Disable the firewall and SELinux by running the following commands:
 
-.. code-block:: bash
+  .. code-block:: bash
 
-  systemctl disable firewalld
-  systemctl stop firewalld
-  setenforce 0
-  sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
+    systemctl disable firewalld
+    systemctl stop firewalld
+    setenforce 0
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
-Installing Python
-.................
+  Installing Python
+  .................
 
-Install Python by running the following commands:
+  Install Python by running the following commands:
 
-.. code-block:: bash
+  .. code-block:: bash
 
-  yum -y install python36
-  python3.6 -m ensurepip
-  yum -y install python36-setuptools
-  pip install -U pip
-  pip install boto3
+    yum -y install python36
+    python3.6 -m ensurepip
+    yum -y install python36-setuptools
+    pip install -U pip
+    pip install boto3
