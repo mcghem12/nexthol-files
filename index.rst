@@ -300,6 +300,8 @@ Creating the Export
 
    By default an NFS export will allow read/write access to any host that mounts the export, but this can be restricted to specific IPs or IP ranges.
 
+#. Click **Next**.
+
 #. Review the **Summary** and click **Create**.
 
 Testing the Export
@@ -377,13 +379,17 @@ You will first provision a CentOS VM to use as a client for your Files export.
 
 File Analytics
 +++++++++++++++++
+
 In this exercise you will deploy the File Analytics VM and scan the existing shares to build out the dashboard.  You will also create anomaly alerts and view the audit details for your file server instance.
 
 #. In **Prism** > **File Server** > click **Deploy File Analytics**
 
    .. figure:: images/31.png
+
 #. Select **Deploy**
+
 #. Choose **Upload the File Analytics binary**
+
 #. Select **Choose File** and navigate to the .json and .qcow2 downloaded in the earlier steps
 
    - `nutanix-file-analytics-1.0.1-metadata.json <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
@@ -392,7 +398,9 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    .. figure:: images/32.png
 
 #. Select **Upload Now**
+
 #. After the upload completes select **Install**
+
 #. Fill out the details
 
    - **Name** - Initials
@@ -400,9 +408,13 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    - **Network List** – Primary - Managed
 
 #. Select **Show Advanced Settings**
+
 #. Ensure **DNS Resolver IP** is set to your Active Directory, ntnxlab.local, domain controller/DNS IP address and **ONLY** that address.
+
 #. Choose **Deploy**
+
 #. You can monitor the deployment from the **Tasks** page.  The Analytics VM deployment should take ~5 minutes.
+
 #. In **Prism** > **File Server** > click **File Analytics**
 
    .. figure:: images/33.png
@@ -415,11 +427,13 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    .. figure:: images/34.png
 
 #. Select **Enable**
+
 #. Analytics will perform an initial scan of the existing shares which will take just a couple minutes.  You can see the scan by going to the gear icon within the Analytics UI and selecting **Scan File System**
 
    .. figure:: images/35.png
 
 #. Choose **Cancel** to exit the scan details window
+
 #. After viewing the scan details, refresh your browser.  You should see the **Data Age**, **File Distribution by Size** and **File Distribution by Type** dashboard panels update.
 
    .. figure:: images/36.png
@@ -433,7 +447,8 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    .. figure:: images/37.png
 
 #. Click on your user under **Top 5 active users**.  This will take you to the audit trail of the user.
-#. You can also click on the **Audit Trails** menu and search for either your user or a given file.  You can use wildcards for your search, for example *.doc*
+
+#. You can also click on the **Audit Trails** menu and search for either your user or a given file.  You can use wildcards for your search, for example **.doc**
 
    .. figure:: images/38.png
 
@@ -449,35 +464,45 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    - **User:** All Users
    - **Type:** Hourly
    - **Interval:** 1
+
 #. Choose **Save** for that anomaly table entry
+
 #. Choose **+ Configure new anomaly** and create a second rule with the following settings
 
-   - **Events**: Delete
+   - **Events**: Create
    - **Minimum Operation %**: 1
    - **Minimum Operation Count**: 10
    - **User**: All Users
    - **Type**: Hourly
    - **Interval**: 1
+
 #. Choose **Save** for that anomaly table entry
 
    .. figure:: images/40.png
 
 #. Select **Save** to exit the Define Anomaly Rules window
+
 #. Go to the Sample Data folder in the Marketing share and copy, then paste that folder to the same share.
 
    .. figure:: images/42.png
 
 #. Now delete the original Sample Data folder.
+
 #. While waiting for the Anomaly Alerts to populate we’ll create a permission denial.
 
    .. note:: The Anomaly engine runs every 30 minutes.  While this setting is configurable from the File Analytics VM, modifying this variable is outside the scope of this lab.
 
 #. Create a new directory called **RO** in the Marketing share
+
 #. Create a text file in the **RO** directory with some text like “hello world” called **myfile.txt**
+
 #. Go to the **Properties** of the **RO** folder and select the Security tab
+
 #. Select **Advanced**
+
 #. Choose **Disable inheritance** and select the **Convert…** option
-#. Then edit the Everyone permissions with the following:
+
+#. Then add the **Everyone** permissions with the following:
 
    - Read & Execute
    - List folder contents
@@ -486,6 +511,7 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
    .. figure:: images/43.png
 
 #. Choose **OK** then **OK** again
+
 #. Open a PowerShell window as a specific user
 
    - Hold down **Shift** and **right click** on the **PowerShell icon** on the taskbar
@@ -521,6 +547,7 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
 
 New with Files 3.5
 ++++++++++++
+
 With the recent Files 3.5 release we have introduced:
 
 - Support for NFSv3
