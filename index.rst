@@ -144,8 +144,8 @@ Deploying Files
 
 #. Download the File Analytics json and qcow files to the Tools VM
 
-   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
-   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
+   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
+   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
 
 #. Upon completion, return to **Prism > File Server** and select the *Initials*\ **-Files** server and click **Protect**.
 
@@ -386,8 +386,8 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
 #. Choose **Upload the File Analytics binary**
 #. Select **Choose File** and navigate to the .json and .qcow2 downloaded in the earlier steps
 
-   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
-   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.55.251.38/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
+   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
+   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
 
    .. figure:: images/32.png
 
