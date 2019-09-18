@@ -388,25 +388,14 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
 
 #. Select **Deploy**
 
-#. Choose **Upload the File Analytics binary**
-
-#. Select **Choose File** and navigate to the .json and .qcow2 downloaded in the earlier steps
-
-   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
-   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
-
-   .. figure:: images/32.png
-
-#. Select **Upload Now**
-
-#. After the upload completes select **Install**
+#. Choose **Download** for the 2.0.x version available
 
 #. Fill out the details
 
    - **Name** - Initials
    - **Storage Container** – Will automatically select the container used by your file server instance
    - **Network List** – Primary - Managed
-
+   
 #. Select **Show Advanced Settings**
 
 #. Ensure **DNS Resolver IP** is set to your Active Directory, ntnxlab.local, domain controller/DNS IP address and **ONLY** that address.
@@ -554,8 +543,8 @@ With the recent Files 3.5 release we have introduced:
 - Support for Self-Service File Restore for NFS (currently supported for SMB shares)
 - Support for Change File Tracking (CFT) Backup for NFS (currently supported for SMB shares)
 - Support for Nutanix software-based Data-At-Rest Encryption
-- Support for multi-protocol access to shares
-- File Analytics, a comprehensive view into Files usage for the purposes of insights into file system data, file and user audit trails and anomaly detection.
+- Support for multi-protocol access to shares (Now GA with Files 3.5.1)
+- File Analytics, a comprehensive view into Files usage for the purposes of insights into file system data, file and user audit trails and anomaly detection (Now GA with Files 3.5.2 and File Analytics 2.0)
 
 
 Takeaways
