@@ -15,7 +15,7 @@
 Files
 -----
 
-*The estimated time to complete this lab is 60 minutes.*
+*The estimated time to complete this lab is 75 minutes.*
 
 Overview
 ++++++++
@@ -39,7 +39,7 @@ Deploying Files
 
    .. figure:: images/1.png
 
-   For the purpose of saving time, the Files 3.5 package has already been uploaded to your cluster. Files binaries can be downloaded directly through Prism or uploaded manually.
+   For the purpose of saving time, the Files 3.6 package has already been uploaded to your cluster. Files binaries can be downloaded directly through Prism or uploaded manually.
 
    .. figure:: images/2.png
 
@@ -97,7 +97,7 @@ Deploying Files
 
 #. Select the **Primary - Managed** VLAN for the Storage Network.
 
-   Each Files VM will consume a single IP on the storage network, plus 1 additional IP for the cluster.
+   Each Files VM will consume a single IP on the storage network.
 
    .. figure:: images/8.png
 
@@ -141,11 +141,6 @@ Deploying Files
 #. Download the sample files for File Analytics to the Tools VM:
 
    - `https://peerresources.blob.core.windows.net/sample-data/SampleData_Small.zip <https://peerresources.blob.core.windows.net/sample-data/SampleData_Small.zip>`_
-
-#. Download the File Analytics json and qcow files to the Tools VM
-
-   - `nutanix-file-analytics-1.0.1-metadata.json <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1-metadata.json>`_
-   - `nutanix-file-analytics-1.0.1.qcow2 <http://10.42.194.11/workshop_staging/nutanix-file-analytics-1.0.1.qcow2>`_
 
 #. Upon completion, return to **Prism > File Server** and select the *Initials*\ **-Files** server and click **Protect**.
 
@@ -377,8 +372,134 @@ You will first provision a CentOS VM to use as a client for your Files export.
 
    Note that the utilization data is updated every 10 minutes.
 
+Selective File Blocking
++++++++++++++++++++++++
+
+In this exercise you will configure Files to block specific file extensions for the file server and the Marketing share. 
+
+#. In **Prism** > **File Server** > Select your file server and click **Update** > then click **Blocked File Types**
+
+   .. figure:: images/47.png
+   
+#. Under **Blocked File Types** enter a comma separated list of extensions like .flv,.mov and click **Save**
+
+   .. figure:: images/48.png
+   
+#. Open a PowerShell window by clicking on the **PowerShell icon** on the taskbar. Enter the following command where you will see an access denied error message: 
+
+   .. code-block:: bash
+     
+	 new-item \\xyz-files.ntnxlab.local\marketing\MyMovie.flv
+   
+   .. figure:: images/49.png
+   
+#. In **Prism** > **File Server** > **Share/Export** > click on the Marketing share and select **Update**
+
+   .. figure:: images/50.png
+	
+#. Select **Next** to get to the **Settings** page.
+
+#. Check **Blocked File Types** and enter .none as a file extension. 
+
+   .. figure:: images/51.png
+   
+#. Select **Next** then **Save** on the **Summary** page to complete the update. 
+
+#. Blocked file type settings at the share level override the server level setting.  Using PowerShell issue the same command as the previous step.  The command will now complete successfully.
+
+   .. figure:: images/52.png
+
+Multi-protocol
+++++++++++++++
+
+In this exercise you will configure an existing SMB share to also support NFS. Enabling multi-protocol access requires you to configure user mappings and define the native and non-native protocol for a share.  
+
+Configure User Mappings
+.......................
+
+A Nutanix Files share has the concept of a native and non-native protocol.  All permissions are applied using the native protocol.  
+Any access requests using the non-native protocol requires a user or group mapping to the permission applied from the native side.
+There are several ways to apply user and group mappings including rule based, explicit and default mappings.  You will first configure a default mapping.
+
+#. In **Prism** > **File Server** > Select your file server and click **Protocol Management** > then click **User Mapping**
+
+   .. figure:: images/53.png
+   
+#. In the **User Mapping** dialog click **Next** at least two times, until you are on the **Default Mapping** page. 
+
+#. From the **Default Mapping** page choose both **Deny access to NFS export** and **Deny access to SMB share** as the defaults for when no mapping is found.
+
+   .. figure:: images/54.png
+   
+#. Complete the initial mapping by choosing **Next** and then **Save** on the **Summary** page. 
+
+#. In **Prism** > **File Server** > **Share/Export** > click on the Marketing share and select **Update**.
+
+#. From the **Basics** page check the box at the bottom which says **Enable multiprotocol access for NFS**.
+
+   .. figure:: images/55.png
+   
+#. Click **Next** then from the **Settings* page check **Simultaneous access to the same files from both protocols**.
+
+   .. figure:: images/56.png
+
+#. Click **Next** and then **Save** from the **Summary** page. 
+
+#. Connect via SSH to the *Initials*\ -NFS-Client VM.
+
+#. Execute the following commands:
+
+     .. code-block:: bash
+
+       [root@CentOS ~]# mkdir /filesmnt/marketing
+       [root@CentOS ~]# mount.nfs4 <Intials>-Files.ntnxlab.local:/Marketing /filesmnt/marketing
+       [root@CentOS ~]# dir /filesmnt/marketing
+       dir: cannot open directory /filesmnt/marketing: Permission denied
+       [root@CentOS ~]#
+	  
+   .. note:: The mount operation is case sensitive.  
+
+Because the default mapping is to deny access the Permission denied error is expected.  You will now add an explicit mapping to allow access to the non-native NFS protocol user. 
+We will need to get the user ID (UID) to create the explicit mapping.
+
+#. Execute the following command and take note of the UID:
+
+     .. code-block:: bash
+
+       [root@CentOS ~]# id
+       uid=0(root) gid=0(root) groups=0(root) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+       [root@CentOS ~]#
+
+#. In **Prism** > **File Server** > Select your file server and click **Protocol Management** > then click **User Mapping**
+
+#. Click **Next** until you are on the **Explicit Mapping** page 
+
+#. Click **+ Add one-to-one mapping**
+
+#. Fill out the following fields:
+
+   - **SMB Name** - ntnxlab\\administrator
+   - **NFS ID** - UID from previous step (0 if root)
+   - **User/Group** - User
+
+   .. figure:: images/57.png
+
+#. Click **Save** under the **Actions** column
+
+#. Click **Next** until the **Summary** page and then click **Save**
+
+#. Click **Close**
+
+#. Go back to the NFS-Client VM and execute the following:
+
+     .. code-block:: bash
+
+       [root@CentOS ~]# dir /filesmnt/marketing
+       MyMovie.flv
+       [root@CentOS ~]#
+
 File Analytics
-+++++++++++++++++
+++++++++++++++
 
 In this exercise you will deploy the File Analytics VM and scan the existing shares to build out the dashboard.  You will also create anomaly alerts and view the audit details for your file server instance.
 
@@ -534,17 +655,17 @@ In this exercise you will deploy the File Analytics VM and scan the existing sha
 
    .. note:: The Capacity Trend dashboard panel updates every 24 hrs.
 
-New with Files 3.5
+New with Files 3.6
 ++++++++++++
 
-With the recent Files 3.5 release we have introduced:
+With the recent Files 3.6 release we have introduced:
 
-- Support for NFSv3
-- Support for Self-Service File Restore for NFS (currently supported for SMB shares)
-- Support for Change File Tracking (CFT) Backup for NFS (currently supported for SMB shares)
-- Support for Nutanix software-based Data-At-Rest Encryption
-- Support for multi-protocol access to shares (Now GA with Files 3.5.1)
-- File Analytics, a comprehensive view into Files usage for the purposes of insights into file system data, file and user audit trails and anomaly detection (Now GA with Files 3.5.2 and File Analytics 2.0)
+- NearSync DR support
+- In-flight Encryption for SMB
+- SMB durable handle support
+- Selective file blocking
+- Windows 2019 domain and client support
+- 120TB node support
 
 
 Takeaways
