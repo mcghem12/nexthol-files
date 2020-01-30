@@ -451,10 +451,10 @@ There are several ways to apply user and group mappings including rule based, ex
 
      .. code-block:: bash
 
-       [root@CentOS ~]# mkdir /filesmnt/marketing
-       [root@CentOS ~]# mount.nfs4 <Intials>-Files.ntnxlab.local:/Marketing /filesmnt/marketing
-       [root@CentOS ~]# dir /filesmnt/marketing
-       dir: cannot open directory /filesmnt/marketing: Permission denied
+       [root@CentOS ~]# mkdir /filesmulti
+       [root@CentOS ~]# mount.nfs4 <Intials>-Files.ntnxlab.local:/Marketing /filesmulti
+       [root@CentOS ~]# dir /filesmulti
+       dir: cannot open directory /filesmulti: Permission denied
        [root@CentOS ~]#
 	  
    .. note:: The mount operation is case sensitive.  
@@ -494,8 +494,8 @@ We will need to get the user ID (UID) to create the explicit mapping.
 
      .. code-block:: bash
 
-       [root@CentOS ~]# dir /filesmnt/marketing
-       MyMovie.flv
+       [root@CentOS ~]# dir /filesmulti
+       MyMovie.flv Sample\ Data
        [root@CentOS ~]#
 
 File Analytics
